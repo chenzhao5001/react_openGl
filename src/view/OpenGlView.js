@@ -2,6 +2,7 @@ import React from "react"
 
 import * as THREE from 'three'
 import gsap from 'gsap'
+import * as dat from 'dat.gui'
 
 //轨道控制器
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
@@ -14,6 +15,7 @@ class OpenGlView extends React.Component {
   controls = new OrbitControls( this.camera, this.renderer.domElement );
   axesHelper = new THREE.AxesHelper( 5 );
   clock = new THREE.Clock()
+  gui = new dat.GUI();
 
   constructor(props) {
     super(props);
@@ -62,6 +64,9 @@ class OpenGlView extends React.Component {
     cube2.position.x = 2;
     cube2.scale.x = 2;
     this.scene.add( cube2 );
+    this.gui.add(cube2.position,"x").min(0).max(5).step(0.1).name("移动x").onChange((value) => {
+      console.log(value);
+    }).onFinishChange((value) => {});
 
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
