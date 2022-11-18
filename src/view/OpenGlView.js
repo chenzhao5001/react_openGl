@@ -17,10 +17,25 @@ class OpenGlView extends React.Component {
 
   constructor(props) {
     super(props);
+
+    // 窗口自适应
     window.addEventListener("resize",() => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth,window.innerHeight);
+      // 自适应屏幕像素比
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+    })
+
+    // 全屏控制
+    window.addEventListener("dblclick",() => {
+      if(document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        this.renderer.domElement.requestFullscreen();
+      }
+
+      // this.renderer.domElement.requestFullscreen();
     })
   }
 
