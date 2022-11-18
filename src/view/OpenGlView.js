@@ -1,5 +1,7 @@
 import React from "react";
 import * as THREE from 'three'
+import gsap from 'gsap'
+
 //轨道控制器
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import './wrap.css'
@@ -10,8 +12,18 @@ class OpenGlView extends React.Component {
   renderer = new THREE.WebGLRenderer();
   controls = new OrbitControls( this.camera, this.renderer.domElement );
   axesHelper = new THREE.AxesHelper( 5 );
+  clock = new THREE.Clock()
+
+  constructor(props) {
+    super(props);
+    window.addEventListener("resize",() => {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth,window.innerHeight);
+    })
+  }
+
   animate = () => {
-    // 请求动画帧函数
     requestAnimationFrame( this.animate );
     this.renderer.render( this.scene, this.camera );
   }
@@ -25,15 +37,14 @@ class OpenGlView extends React.Component {
     const material1 = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
     const cube1 = new THREE.Mesh( geometry1, material1 );
     this.scene.add( cube1 );
+    gsap.to(cube1.position,{x:5,y:5,duration:5})
+    gsap.to(cube1.rotation,{x:2*Math.PI,duration:5})
 
     const geometry2 = new THREE.BoxGeometry( 1, 1, 1 );
     const material2 = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
     const cube2 = new THREE.Mesh( geometry2, material2 );
     cube2.position.x = 2;
     cube2.scale.x = 2;
-    cube2.rotation = {x:1,y:1,z:1}
-    // cube2.applyEuler(1,0,0);
-
     this.scene.add( cube2 );
 
 
