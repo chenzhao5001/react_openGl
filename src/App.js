@@ -1,8 +1,12 @@
 import OpenGlView from './view/OpenGlView'
 
+const index = 1
 function App() {
   return (
-    <OpenGlView />
+    <>
+      {index === 1 ? <OpenGlView />:''}
+      {index === 2 ? <OpenGlView />:''}
+    </>
   );
 }
 

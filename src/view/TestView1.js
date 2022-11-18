@@ -1,5 +1,4 @@
-import React from "react"
-
+import React from "react";
 import * as THREE from 'three'
 import gsap from 'gsap'
 
@@ -60,4 +59,4 @@ class OpenGlView extends React.Component {
   }
 }
 
-export default OpenGlView;
+export default OpenGlView
