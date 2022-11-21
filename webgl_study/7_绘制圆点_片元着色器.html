@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+  </style>
+</head>
+
+<body>
+<canvas width="500" height="500" id="canvas"></canvas>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+  attribute vec4 a_Position;
+  void main() {
+    gl_Position = a_Position;
+    gl_PointSize = 10.0;
+  }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+  precision mediump float;
+  uniform vec4 u_FragClolr;
+  void main() {
+    float dist = distance(gl_PointCoord,vec2(0.5,0.5));
+    if(dist < 0.5) {
+      gl_FragColor = vec4(1.0,1.0,0,1.0);
+    } else {
+      discard;
+    }
+  }
+</script>
+
+<script type="module">
+  import {initShaders,coordinateChange} from './jsm/utils.js'
+  import Poly from './jsm/Poly.js'
+
+  const canvas = document.getElementById('canvas')
+  const gl = canvas.getContext('webgl');
+  const vsSource = document.querySelector("#vertexShader").innerText;
+  const fsSource = document.querySelector("#fragmentShader").innerText;
+
+  //初始化着色器
+  initShaders(gl,vsSource,fsSource);
+
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  const poly = new Poly({
+    gl,
+    vertices: [
+      0.0, 0.1,
+      -0.1, -0.5,
+      1.0, 1.0
+    ],
+    types:['POINTS','LINE_STRIP'],
+  })
+  poly.draw()
+
+  canvas.addEventListener("click",({clientX,clientY}) => {
+    const coordinate = coordinateChange(canvas,[clientX,clientY]);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    poly.addVertice(...coordinate);
+    poly.draw();
+
+
+
+  })
+
+</script>
+</body>
+</html>
