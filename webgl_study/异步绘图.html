@@ -25,76 +25,48 @@
 </script>
 
 <script type="module">
+  import {initShaders} from './jsm/utils.js'
+  import Poly from './jsm/Poly.js'
+
   const canvas = document.getElementById('canvas')
   const gl = canvas.getContext('webgl');
-  // const s = new Sky(gl)
-  // console.log(s);
-
   const vsSource = document.querySelector("#vertexShader").innerText;
   const fsSource = document.querySelector("#fragmentShader").innerText;
-
-  console.log(vsSource);
-  console.log(fsSource);
 
   //初始化着色器
   initShaders(gl,vsSource,fsSource);
 
-  const vertices = new Float32Array([
-    // 0.0, 0.1,
-    // -0.1, -0.1,
-    // 0.1, -0.5,
-    0.1,0.4,
-    -0.2,0.5,
-    -0.3,-0.7,
-  ]);
-  // 创建缓冲区
-  const verticesBuffer = gl.createBuffer();
-  // 绑定缓冲区
-  gl.bindBuffer(gl.ARRAY_BUFFER,verticesBuffer);
-  // 写入缓冲区
-  gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
-
-  // 获取attribute对象
-  const a_Position = gl.getAttribLocation(gl.program,'a_Position');
-  // gl.vertexAttrib4f(a_Position,0.5,0,0,1);
-
-  // 只有xy分量，所以是2
-  gl.vertexAttribPointer(a_Position,2,gl.FLOAT,false,0,0);
-  // 批处理
-  gl.enableVertexAttribArray(a_Position);
-
-
-
-
-  // 指定颜色，放入颜色缓冲区
   gl.clearColor(0, 0, 0, 1);
-  // 刷背景
   gl.clear(gl.COLOR_BUFFER_BIT);
-  //绘制顶点
 
-  // 3参数 顶点个数
-  gl.drawArrays(gl.TRIANGLES,0,3);
+  const poly = new Poly({
+    gl,
+    vertices: [
+      0.0, 0.1,
+      -0.1, -0.5,
+      0.1, -0,1
+    ],
+  })
+  poly.draw()
 
-  function initShaders(gl,vsSource,fsSource) {
-    const program = gl.createProgram();
-    const vertexShader = loadShader(gl,gl.VERTEX_SHADER,vsSource);
-    const fragmentShader = loadShader(gl,gl.FRAGMENT_SHADER,fsSource);
+  setTimeout(() => {
+    poly.addVertice(-0.2,-0.1)
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    poly.draw();
 
-    gl.attachShader(program,vertexShader);
-    gl.attachShader(program,fragmentShader);
+  },1000);
+  setTimeout(() => {
+    poly.popVertice()
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    poly.draw();
+  },2000);
 
-    gl.linkProgram(program);
-    gl.useProgram(program);
-    gl.program = program;
-    return true;
-  }
+  setTimeout(() => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    poly.draw(['POINTS','LINE_STRIP']);
+  },3000);
 
-  function loadShader(gl,type,source) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader,source);
-    gl.compileShader(shader);
-    return shader;
-  }
+
 </script>
 </body>
 </html>

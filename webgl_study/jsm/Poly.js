@@ -4,7 +4,7 @@ const defAttr = () => ({
   geoData:[],
   size:2,
   attrName:'a_Position',
-  count:0,
+  count:1,
   types:['POINTS'],
 })
 
@@ -54,7 +54,7 @@ export default class Poly {
 
   updateBuffer() {
     this.updateCount();
-    this.gl.bufferData(this.gl.ARRAY_BUFFER,this.vertices,this.gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER,new Float32Array(this.vertices),this.gl.STATIC_DRAW);
   }
 
   updateCount() {
@@ -74,7 +74,7 @@ export default class Poly {
 
   draw(types = this.types) {
     for(let type of types) {
-      this.gl.drawArrays(this.gl[types],0,this.count);
+      this.gl.drawArrays(this.gl[type],0,this.count);
     }
   }
 }
