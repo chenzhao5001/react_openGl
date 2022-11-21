@@ -23,19 +23,16 @@ export default class Poly {
     this.init()
   }
   init() {
-    const {attrName,size,gl} = this;
-    if(!gl) return;
+    // const {attrName,size,gl} = this;
+    if(!this.gl) return;
 
-    const verticesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER,verticesBuffer);
-    this.updateBuffer(gl);
+    const verticesBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER,verticesBuffer);
+    this.updateBuffer(this.gl);
 
-    const a_Position = gl.getAttribLocation(gl.program,'a_Position');
-    gl.vertexAttribPointer(a_Position,size,gl.FLOAT,false,0,0);
-    gl.enableVertexAttribArray(a_Position);
-    // gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
-
-
+    const a_Position = this.gl.getAttribLocation(this.gl.program,'a_Position');
+    this.gl.vertexAttribPointer(a_Position,this.size,this.gl.FLOAT,false,0,0);
+    this.gl.enableVertexAttribArray(a_Position);
   }
   addVertice(...params) {
     this.vertices.push(...params)
@@ -43,24 +40,21 @@ export default class Poly {
   }
 
   popVertice() {
-    const [vertices,size] = this;
-    const len = vertices.length;
-    vertices.splice(len-size,len)
+    const len = this.vertices.length;
+    this.vertices.splice(len-this.size,len)
     this.updateCount();
   }
 
   setVertice(ind,...params) {
-    const [vertices,size] = this;
-    const i = ind*size;
+    const i = ind * this.size;
     params.forEach((param,paramInd) => {
-      vertices[i+ paramInd] = param
+      this.vertices[i+ paramInd] = param
     })
   }
 
   updateBuffer() {
-    const {gl,vertices} = this;
     this.updateCount();
-    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER,this.vertices,this.gl.STATIC_DRAW);
   }
 
   updateCount() {
@@ -68,9 +62,8 @@ export default class Poly {
   }
 
   updateVertices(params) {
-    const {geoData} = this;
     const vertices = [];
-    geoData.forEach(data => {
+    this.geoData.forEach(data => {
       params.forEach(key => {
         vertices.push(data[key])
       })
@@ -80,9 +73,8 @@ export default class Poly {
   }
 
   draw(types = this.types) {
-    const [gl,count] = this;
     for(let type of types) {
-      gl.drawArrays(gl[types],0,count);
+      this.gl.drawArrays(this.gl[types],0,this.count);
     }
   }
 }
