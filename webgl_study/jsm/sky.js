@@ -1,4 +1,4 @@
-class Sky {
+export default class Sky {
   constructor(gl) {
     this.gl = gl;
     this.children = [];
