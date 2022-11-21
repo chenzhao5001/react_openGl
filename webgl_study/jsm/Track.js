@@ -22,7 +22,7 @@ export default class Track {
             } else if(time > fms[last][0]) {
                 target[key] = fms[last][1]
             } else {
-                target[key] = getValBetweenFms(time,fms,last)
+                target[key] = this.getValBetweenFms(time,fms,last)
             }
         }
     }

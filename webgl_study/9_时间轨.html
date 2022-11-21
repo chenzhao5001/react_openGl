@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+
+<body>
+<canvas width="500" height="500" id="canvas"></canvas>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    attribute vec4 a_Position;
+    attribute float a_PointSize;
+    void main() {
+        gl_Position = a_Position;
+        gl_PointSize = a_PointSize;
+    }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    uniform vec4 u_FragColor;
+    void main() {
+        float dist = distance(gl_PointCoord,vec2(0.5,0.5));
+        if(dist < 0.5) {
+            gl_FragColor = u_FragColor;
+        } else {
+            discard;
+        }
+    }
+</script>
+
+<script type="module">
+    import {initShaders,coordinateChange} from './jsm/utils.js'
+    import Poly from './jsm/Poly.js'
+    import Compose from "./jsm/Compose.js";
+    import Track from "./jsm/Track.js";
+
+    const canvas = document.getElementById('canvas')
+    const gl = canvas.getContext('webgl');
+
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+    const vsSource = document.querySelector("#vertexShader").innerText;
+    const fsSource = document.querySelector("#fragmentShader").innerText;
+
+    //初始化着色器
+    initShaders(gl,vsSource,fsSource);
+
+    const a_Position = gl.getAttribLocation(gl.program,'a_Position');
+    const a_PointSize = gl.getAttribLocation(gl.program,'a_PointSize');
+    const u_FragColor = gl.getAttribLocation(gl.program,'u_FragColor');
+
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINT,0,1);
+
+    const compost = new Compose();
+    const starts =[];
+    canvas.addEventListener('click',(event) => {
+        const [x,y] = coordinateChange(canvas,[event.clientX,event.clientY]);
+        const a = 1;
+
+        const s = Math.random()*5 + 2;
+        const obj = {x,y,s,a};
+        starts.push(obj);
+
+        const track = new Track(obj);
+        track.start = new Date();
+        track.keyMap = new Map([
+            ['a',[
+                500,'a',
+                1000,'a',
+                1500,'a'
+            ]]
+        ])
+
+        track.timeLen = 2000;
+        track.loop = true;
+        compost.add(track)
+    });
+
+    (function ani() {
+        compost.update(new Date())
+        render();
+        requestAnimationFrame(ani)
+
+    })()
+
+    function render() {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        starts.forEach(({x,y,s,a}) => {
+            gl.vertexAttrib2f(a_Position,x,y)
+            gl.vertexAttrib1f(a_PointSize,s)
+            gl.vertexAttrib4f(u_FragColor,0.87,0.92,1,a)
+            gl.drawArrays(gl.POINTS,0,1);
+        })
+
+    }
+
+
+</script>
+</body>
+</html>
