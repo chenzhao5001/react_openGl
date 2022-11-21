@@ -1,4 +1,4 @@
-export default class Sky {
+class Sky {
   constructor(gl) {
     this.gl = gl;
     this.children = [];
@@ -21,5 +21,6 @@ export default class Sky {
       ele.draw();
     })
   }
-
 }
+
+export {Sky}
