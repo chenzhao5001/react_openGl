@@ -18,3 +18,18 @@ function loadShader(gl,type,source) {
   gl.compileShader(shader);
   return shader;
 }
+
+
+export function coordinateChange(canvas,[clientX,clientY]) {
+  const {left,top,width,height} = canvas.getBoundingClientRect();
+  const [cssX,cssY] = [clientX - left, clientY - top];
+  // 坐标原点差异化
+  const [halfWidth,halfHeight] = [width/2,height/2]
+  const [xBaseCenter,yBaseCenter] = [
+    cssX - halfWidth,
+    cssY - halfHeight
+  ]
+  // 解决 y方向差异化
+  const yBaseCenterTop = -yBaseCenter;
+  return [xBaseCenter / halfWidth,yBaseCenterTop /halfHeight]
+}
