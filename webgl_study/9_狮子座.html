@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+
+<body>
+<canvas width="500" height="500" id="canvas"></canvas>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    attribute vec4 a_Attr;
+    varying float v_Alpha;
+
+    void main() {
+        gl_Position = (a_Attr.x,a_Attr.y,0.0,1.0);
+        gl_PointSize = a_Attr.z;
+        v_Alpha = a_Attr.w;
+    }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    //接收顶点着色器的变量
+    varying float v_Alpha;
+    uniform vec4 u_FragClolr;
+    void main() {
+        float dist = distance(gl_PointCoord,vec2(0.5,0.5));
+        if(dist < 0.5) {
+            gl_FragColor = vec4(0.87,0.91,0,v_Alpha);
+        } else {
+            discard;
+        }
+    }
+</script>
+
+<script type="module">
+    import {initShaders,coordinateChange} from './jsm/utils.js'
+    import Poly from './jsm/Poly.js'
+    import Sky from './jsm/sky.js'
+
+    const canvas = document.getElementById('canvas')
+    const gl = canvas.getContext('webgl');
+    const vsSource = document.querySelector("#vertexShader").innerText;
+    const fsSource = document.querySelector("#fragmentShader").innerText;
+
+    //初始化着色器
+    initShaders(gl,vsSource,fsSource);
+
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    const sky = new Sky(gl);
+
+    // 屏蔽鼠标右击事件
+    canvas.oncontextmenu = function () {
+        return false;
+    }
+
+
+    // const poly = new Poly({
+    //   gl,
+    //   vertices: [
+    //     0.0, 0.1,
+    //     -0.1, -0.5,
+    //     1.0, 1.0
+    //   ],
+    //   types:['POINTS','LINE_STRIP'],
+    // })
+    // poly.draw()
+    //
+
+    let poly = null;
+    canvas.addEventListener("mousedown",(event) => {
+
+        // 右击
+        if(event.button === 2) {
+            if(poly) {
+                popVertice();
+            }
+        } else {
+            const [x,y] = coordinateChange(canvas,[event.clientX,event.clientY]);
+            if(poly) {
+                poly.addVertice(x,y)
+            } else {
+                createPoly(x,y);
+            }
+        }
+        render()
+    })
+
+    canvas.addEventListener('mousemove',(event) => {
+        if(poly) {
+            const [x,y] = coordinateChange(canvas,[event.clientX,event.clientY]);
+            poly.setVertice(poly.count - 1,x,y);
+            render();
+        }
+
+    })
+
+    function createPoly(x,y) {
+        poly = new Poly({
+            vertices:[x,y,x,y],
+            types:['POINTS','LINE_STRIP'],
+        })
+        sky.add(poly)
+    }
+
+    function popVertice() {
+        poly.popVertice();
+        poly = null;
+    }
+
+    function render() {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        sky.draw();
+    }
+
+</script>
+</body>
+</html>
